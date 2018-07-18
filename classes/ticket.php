@@ -149,7 +149,6 @@ class Ticket {
         $sql = 'UPDATE hlp_tickets
                 SET
                 sta_id = ?,
-                pri_id = ?,
                 mch_id = ?,
                 ntr_id = ?,
                 prb_id = ?,
@@ -157,14 +156,13 @@ class Ticket {
                 tkt_dt_close = ?,
                 tkt_notes = ?,
                 tkt_notes_close = ?,
-                prb_id_close = ?,
+                prb_id_close = ?
                 WHERE tkt_id = ?';
         $pdo = $this->pdo;
         if(isset($ticket)){
             $stmt = $pdo->prepare($sql);
             if($stmt->execute([
                 $ticket->status,
-                $ticket->prioridade,
                 $ticket->equipamento,
                 $ticket->natureza,
                 $ticket->problema,
@@ -306,7 +304,8 @@ class Ticket {
                            p.pnt_id,
                            p.pnt_name,
                            k.pri_name,
-                           m.mch_sku
+                           m.mch_sku,
+                           t.tkt_sku
                       FROM hlp_tickets t,
                            hlp_mchn m,
                            hlp_ponto p,

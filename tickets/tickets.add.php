@@ -37,7 +37,7 @@
     	// o texto de email muda caso haja ou não redirecionamento para técnico
     	if (empty($chamado->usuario)) {
     		$email = new ArrayObject();  
-    		$email->address   = 'felipe@combovideos.com.br';
+    		$email->address   = $_SESSION['user']['email'];
     		$email->subject   = 'Abertura de Chamado - ' . date('d/m/Y');
     		$email->message   = 'Um novo chamado foi aberto no sistema.<br>'; 
     		$email->message  .= 'Confira os detalhes e redirecione-o para um técnico para sua execução, acessando o endereço abaixo:<br>'; 

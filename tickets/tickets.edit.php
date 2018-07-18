@@ -23,8 +23,15 @@
 		$error[] = 'Data inválida';
 	}
 
+	if ($_POST['sta_id'] == HELPDESK_FECHADO) {		
+		if ($_POST['tkt_dt_close'] == '--') {
+			$error[] = 'Informe a data de fechamento';		
+		}
+	}
+
 	$chamado = new ArrayObject();  
 
+	$chamado->id                 = $_POST['tkt_id'];  
 	$chamado->usuario            = $_POST['usr_id'];
 	$chamado->status             = $_POST['sta_id'];
 	$chamado->equipamento        = $_POST['mch_id'];
@@ -33,43 +40,22 @@
 	$chamado->dataAbertura       = formataDataMySQL($_POST['tkt_dt_open']);;
 	$chamado->obs                = $_POST['tkt_notes'];	
 	$chamado->obsFechamento      = $_POST['tkt_notes_close'];	
-	$chamado->dataFechamento     = $_POST['tkt_dt_close'];
+	$chamado->dataFechamento     = formataDataMySQL($_POST['tkt_dt_close']);
 	$chamado->problemaFechamento = $_POST['prb_id_close'];
 
-	if (empty($_POST['reg_data'])) {
-    	$error[] = 'Preencha a data';
-    }
+	if ($ticket->ticketUpdate($chamado)) {
 
-    if () {
-    	$error[] = 'Preencha a data';
-    }
-
-
-
-	$chamado->id = $ticket->addTicket($chamado);
-    if ($chamado->id > 0) {
-
-    	// envio de email após abertura de chamado
-    	// o texto de email muda caso haja ou não redirecionamento para técnico
     	if (empty($chamado->usuario)) {
     		$email = new ArrayObject();  
-    		$email->address   = 'felipe@combovideos.com.br';
-    		$email->subject   = 'Abertura de Chamado - ' . date('d/m/Y');
-    		$email->message   = 'Um novo chamado foi aberto no sistema.<br>'; 
-    		$email->message  .= 'Confira os detalhes e redirecione-o para um técnico para sua execução, acessando o endereço abaixo:<br>'; 
-    		$email->message  .= DIR . '/tickets/ticket.edit.php?id=' . $chamado->id;
-            sendConfirmationEmail($email);
-    	} else {
-    		$email = new ArrayObject();  
-    		$email->address  = 'felipe@combovideos.com.br';
-    		$email->subject  = 'Abertura de Chamado - ' . date('d/m/Y');
-    		$email->message   = 'Um novo chamado foi aberto no sistema e redirecionado a você.<br>'; 
-    		$email->message  .= 'Confira os detalhes, acessando o endereço abaixo:<br>'; 
+    		$email->address   = $_SESSION['user']['email'];
+    		$email->subject   = 'Alteração de Status do Chamado - ' . date('d/m/Y');
+    		$email->message   = 'O chamado XXXXX teve seu status alterado para XXXXX.<br>'; 
+    		$email->message  .= 'Confira os detalhes acessando o endereço abaixo:<br>'; 
     		$email->message  .= DIR . '/tickets/ticket.edit.php?id=' . $chamado->id;
             sendConfirmationEmail($email);
     	}
 
-    	$_SESSION['success'] = 'Chamnado adicionado com sucesso';
+    	$_SESSION['success'] = 'Chamnado alterado com sucesso';
 	    header('Location: tickets.php');	    
     }
         
@@ -292,6 +278,8 @@
 										</div>
 									</div>
 								</footer>
+								<input type="hidden" name="tkt_id" value="<?=$id?>">
+								<input type="hidden" name="tkt_sku" value="<?=$obj['tkt_sku']?>">
 								</form>
 								<?php } // listClientsWithMachine?>
 							</section>
